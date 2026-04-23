@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 19-03-2026 a las 18:27:01
+-- Tiempo de generación: 23-04-2026 a las 17:53:49
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
@@ -28,13 +28,14 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `tareas` (
-  `ID_tarea` int(11) NOT NULL,
-  `ID_usuarios` int(11) NOT NULL,
-  `titulo` int(11) NOT NULL,
-  `descripción` timestamp NOT NULL DEFAULT current_timestamp(),
-  `fecha_creasion` date NOT NULL,
-  `fecha_limite` time NOT NULL,
-  `hora_limite` int(11) NOT NULL
+  `id_tarea` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `titulo` varchar(200) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_limite` date DEFAULT NULL,
+  `estado` enum('pendiente','en_progreso','completada','cancelada') DEFAULT 'pendiente',
+  `prioridad` enum('baja','media','alta') DEFAULT 'media'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -44,16 +45,14 @@ CREATE TABLE `tareas` (
 --
 
 CREATE TABLE `usuario` (
-  `ID_Usuario` int(11) NOT NULL,
-  `Nombre` varchar(100) NOT NULL,
-  `Apellido` varchar(100) NOT NULL,
-  `Email` varchar(150) NOT NULL,
-  `Password` varchar(255) NOT NULL,
-  `Teléfono` varchar(20) NOT NULL,
-  `Fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `Ultimo_acceso` timestamp NULL DEFAULT NULL,
-  `Activo` tinyint(1) NOT NULL DEFAULT 1,
-  `Picture_Perfil` varchar(255) NOT NULL
+  `id_usuario` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `apellido` varchar(100) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `telefono` varchar(20) DEFAULT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
+  `activo` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -64,13 +63,15 @@ CREATE TABLE `usuario` (
 -- Indices de la tabla `tareas`
 --
 ALTER TABLE `tareas`
-  ADD PRIMARY KEY (`ID_tarea`);
+  ADD PRIMARY KEY (`id_tarea`),
+  ADD KEY `fk_usuario_tarea` (`id_usuario`);
 
 --
 -- Indices de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  ADD PRIMARY KEY (`ID_Usuario`);
+  ADD PRIMARY KEY (`id_usuario`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -80,13 +81,23 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `tareas`
 --
 ALTER TABLE `tareas`
-  MODIFY `ID_tarea` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_tarea` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `ID_Usuario` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `tareas`
+--
+ALTER TABLE `tareas`
+  ADD CONSTRAINT `fk_usuario_tarea` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
