@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-04-2026 a las 17:53:49
+-- Tiempo de generación: 06-05-2026 a las 17:48:26
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `jhvm_tareas`
+-- Base de datos: `tareas_jacobohernandez`
 --
 
 -- --------------------------------------------------------
@@ -32,11 +32,15 @@ CREATE TABLE `tareas` (
   `id_usuario` int(11) NOT NULL,
   `titulo` varchar(200) NOT NULL,
   `descripcion` text DEFAULT NULL,
-  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_creacion` timestamp NULL DEFAULT current_timestamp(),
   `fecha_limite` date DEFAULT NULL,
+  `hora_limite` time DEFAULT NULL,
   `estado` enum('pendiente','en_progreso','completada','cancelada') DEFAULT 'pendiente',
-  `prioridad` enum('baja','media','alta') DEFAULT 'media'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `clasificacion` enum('personal','trabajo','estudio','hogar','salud','otro') DEFAULT 'personal',
+  `prioridad` enum('baja','media','alta') DEFAULT 'media',
+  `completada` tinyint(4) DEFAULT 0,
+  `fecha_completada` timestamp NULL DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -51,9 +55,11 @@ CREATE TABLE `usuario` (
   `email` varchar(150) NOT NULL,
   `password` varchar(255) NOT NULL,
   `telefono` varchar(20) DEFAULT NULL,
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
-  `activo` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `fecha_registro` timestamp NULL DEFAULT current_timestamp(),
+  `ultimo_acceso` timestamp NULL DEFAULT NULL,
+  `activo` tinyint(1) DEFAULT 1,
+  `foto_perfil` varchar(255) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Índices para tablas volcadas
@@ -64,7 +70,9 @@ CREATE TABLE `usuario` (
 --
 ALTER TABLE `tareas`
   ADD PRIMARY KEY (`id_tarea`),
-  ADD KEY `fk_usuario_tarea` (`id_usuario`);
+  ADD KEY `idx_usuario` (`id_usuario`),
+  ADD KEY `idx_estado` (`estado`),
+  ADD KEY `idx_clasificacion` (`clasificacion`);
 
 --
 -- Indices de la tabla `usuario`
@@ -88,16 +96,6 @@ ALTER TABLE `tareas`
 --
 ALTER TABLE `usuario`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `tareas`
---
-ALTER TABLE `tareas`
-  ADD CONSTRAINT `fk_usuario_tarea` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
